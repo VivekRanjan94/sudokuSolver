@@ -1,28 +1,32 @@
-#include<stdio.h>
+#include <stdio.h>
 
 //Declaring global variables
 int board[9][9];
 int locations[9][3][9];
+int possibility[9][3][9];
 //board[rows][columns]
 
 //Function prototypes
-void printBoard();
-void setLocationsInitial();
-void setBoard();
-void bruteForce();
-void findAllNumbers();
+int square(int rowNum, int colNum);
 int checkSolve();
-void lessBruteForce();
+void locationsInit();
+void boardInit();
+void printBoard();
+void setLocations();
+void solveEasy();
+void solveMed();
+void solveHard();
 
 //Main function
-int main() {
+int main()
+{
 
     //Setting sudoku board to solve
-    setBoard();
+    boardInit();
 
     //Setting locations
-    setLocationsInitial();
-    findAllNumbers();
+    locationsInit();
+    setLocations();
 
     //Printing sudoku board to solve
     printBoard();
@@ -34,31 +38,43 @@ int main() {
 
     //Solving sudoku board
     int previousCheck = 0;
-    for(;;) {
-        if((!checkSolve()) || (checkSolve() == previousCheck)) {
+    for (;;)
+    {
+        if ((!checkSolve()) || (checkSolve() == previousCheck))
+        {
             break;
         }
         previousCheck = checkSolve();
-        bruteForce();
-        lessBruteForce();
+        solveEasy();
+        solveMed();
+        solveHard();
     }
 
     //printing solved sudoku board
     printBoard();
 
     fflush(stdin);
-    printf("\n\nEnter any key to quit:\n");
+    printf("\nEnter any key to quit:\n");
     getchar();
     return 0;
 }
 
 //Function declarations
 
-int checkSolve() {
+int square(int rowNum, int colNum)
+{
+    return ((rowNum / 3) * 3 + (colNum / 3));
+}
+
+int checkSolve()
+{
     int count = 0;
-    for(int i = 0; i<9; i++) {
-        for(int j = 0; j<9; j++) {
-            if(!board[i][j]) {
+    for (int rowNum = 0; rowNum < 9; rowNum++)
+    {
+        for (int colNum = 0; colNum < 9; colNum++)
+        {
+            if (!board[rowNum][colNum])
+            {
                 count++;
             }
         }
@@ -66,50 +82,61 @@ int checkSolve() {
     return count;
 }
 
-void setLocationsInitial() {
-    for(int k = 0; k<9; k++) {
-        for(int i = 0; i<9; i++) {
-            for(int j = 0; j<9; j++) {
-                //Check rows for all numbers
-                locations[k][0][i] = 0;
+void locationsInit()
+{
+    for (int number = 1; number <= 9; number++)
+    {
+        for (int rowNum = 0; rowNum < 9; rowNum++)
+        {
+            for (int colNum = 0; colNum < 9; colNum++)
+            {
+                //Set rows to 0
+                locations[number - 1][0][rowNum] = 0;
 
-                //Check columns for all numbers
-                locations[k][1][j] = 0;
+                //Set cols to 0
+                locations[number - 1][1][colNum] = 0;
 
-                //Check square for all numbers
-                locations[k][2][(i/3)*3 + (j/3)] = 0;
+                //set squares to 0
+                locations[number - 1][2][square(rowNum, colNum)] = 0;
             }
-            
         }
     }
 }
 
-void setBoard() {
+void boardInit()
+{
     FILE *ptr;
     ptr = fopen("board.txt", "r");
-    for(int i = 0; i<9; i++) {
-        for(int j = 0; j<9; j++) {
-            fscanf(ptr, "%d", &board[i][j]);
+    for (int rowNum = 0; rowNum < 9; rowNum++)
+    {
+        for (int colNum = 0; colNum < 9; colNum++)
+        {
+            fscanf(ptr, "%d", &board[rowNum][colNum]);
         }
     }
 }
 
-
-void printBoard() {
-    for(int i = 0; i<9; i++){
+void printBoard()
+{
+    for (int rowNum = 0; rowNum < 9; rowNum++)
+    {
         printf("\n");
-        if(i == 3 || i == 6) {
-            for(int k = 0; k<11; k++) {
+        if (rowNum == 3 || rowNum == 6)
+        {
+            for (int k = 0; k < 11; k++)
+            {
                 printf(".. ");
             }
             printf("\n");
-        }   
-        for(int j = 0; j<9; j++) {
-            if(j == 3 || j == 6) {
+        }
+        for (int colNum = 0; colNum < 9; colNum++)
+        {
+            if (colNum == 3 || colNum == 6)
+            {
                 printf(":  ");
             }
-            printf("%d  ", board[i][j]);
-        }   
+            printf("%d  ", board[rowNum][colNum]);
+        }
     }
 }
 
@@ -117,119 +144,149 @@ void printBoard() {
 //The 3 1-D arrays store 0 or 1 for whether the row, column or square contain the number
 //Now take the intersection of these 3 arrays, if it is found that a number is in none, then fill it
 
-void findAllNumbers() {
-    for(int k = 1; k<=9; k++) {
-        for(int i = 0; i<9; i++) {
-            for(int j = 0; j<9; j++) {
+void setLocations()
+{
+    for (int number = 1; number <= 9; number++)
+    {
+        for (int rowNum = 0; rowNum < 9; rowNum++)
+        {
+            for (int colNum = 0; colNum < 9; colNum++)
+            {
                 //Check rows for all numbers
-                locations[k-1][0][i] += (board[i][j] == k);
+                locations[number - 1][0][rowNum] += (board[rowNum][colNum] == number);
 
                 //Check columns for all numbers
-                locations[k-1][1][j] += (board[i][j] == k);
+                locations[number - 1][1][colNum] += (board[rowNum][colNum] == number);
 
                 //Check square for all numbers
-                locations[k-1][2][(i/3)*3 + (j/3)] += (board[i][j] == k);
+                locations[number - 1][2][square(rowNum, colNum)] += (board[rowNum][colNum] == number);
             }
-            
         }
     }
 }
 
-void  bruteForce() {
+void solveEasy()
+{
     //Now we have an array locations[9][3][9]
     //If locations[k][0][i] == locations[k][1][j] == locations[k][2][l] == 0
-        //Means that the number k is not in location (i,j) coordinate and l'th square
-    
-    for(int i = 0; i<9; i++) {
-        for(int j = 0; j<9; j++) {
-            if(!board[i][j]) {
+    //Means that the number k is not in location (i,j) coordinate and l'th square
+
+    for (int rowNum = 0; rowNum < 9; rowNum++)
+    {
+        for (int colNum = 0; colNum < 9; colNum++)
+        {
+            if (!board[rowNum][colNum])
+            {
                 int canFillNums[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-                for(int k = 1; k<=9; k++) {
-                    if(locations[k-1][0][i] == locations[k-1][1][j] && 
-                                locations[k-1][2][(i/3)*3 + (j/3)] == locations[k-1][1][j] && 
-                                    locations[k-1][0][i] == 0) {
-                        canFillNums[k-1] = 1;
+                for (int number = 1; number <= 9; number++)
+                {
+                    if (locations[number - 1][0][rowNum] == locations[number - 1][1][colNum] &&
+                        locations[number - 1][2][square(rowNum, colNum)] == locations[number - 1][1][colNum] &&
+                        locations[number - 1][0][rowNum] == 0)
+                    {
+                        canFillNums[number - 1] = 1;
                     }
                 }
-                int count = 0, m = 0;
-                for(int l = 0; l<9; l++) {
-                    if(canFillNums[l] == 1) {
+                int count = 0, tempNumToFill = 0;
+                for (int number = 1; number <= 9; number++)
+                {
+                    if (canFillNums[number - 1] == 1)
+                    {
                         count++;
-                        m=l;
+                        tempNumToFill = number;
                     }
                 }
-                if(count == 1) {
-                    board[i][j] = m+1;
-                    locations[m][0][i] = 1;
-                    locations[m][1][j] = 1;
-                    locations[m][2][(i/3)*3 + (j/3)] = 1;
+                if (count == 1)
+                {
+                    board[rowNum][colNum] = tempNumToFill;
+                    locations[tempNumToFill - 1][0][rowNum] = 1;
+                    locations[tempNumToFill - 1][1][colNum] = 1;
+                    locations[tempNumToFill - 1][2][square(rowNum, colNum)] = 1;
                 }
-            } 
+            }
         }
     }
 }
 
-void lessBruteForce() {
-    for(int k = 1; k<=9; k++) {
-        for(int l = 0; l<9; l++) {
-            if(locations[k-1][2][l] == 0) {
-                // printf("Bello, l = %d, k = %d\n", l, k);
-                // printf("Hello\n");
+void solveMed()
+{
+    for (int number = 1; number <= 9; number++)
+    {
+        for (int l = 0; l < 9; l++)
+        {
+            if (locations[number - 1][2][l] == 0)
+            {
 
-                int rowFactor = (l/3)*3;
-                int colFactor = (l%3)*3;
+                int rowFactor = (l / 3) * 3;
+                int colFactor = (l % 3) * 3;
                 int row[3] = {rowFactor, rowFactor + 1, rowFactor + 2};
                 int col[3] = {colFactor, colFactor + 1, colFactor + 2};
 
-                for(int x = 0; x<3; x++) {
+                for (int x = 0; x < 3; x++)
+                {
                     //Row square check
-                    if(locations[k-1][2][(l/3)*3 + x]){
-                        // printf("Hello, l = %d, new l = %d, k = %d\n", l, ((l/3)*3 + x), k);
-                        for(int i = 0; i<3; i++) {
-                            for(int j = 0; j<3; j++) {
-                                if(board[rowFactor + i][j + x*3] == k) {
-                                    row[i] = -1;
+                    if (locations[number - 1][2][(l / 3) * 3 + x])
+                    {
+                        for (int rowNum = 0; rowNum < 3; rowNum++)
+                        {
+                            for (int colNum = 0; colNum < 3; colNum++)
+                            {
+                                if (board[rowNum + rowFactor][colNum + x * 3] == number)
+                                {
+                                    row[rowNum] = -1;
                                 }
                             }
                         }
                     }
 
                     //Col square check
-                    if(locations[k-1][2][l%3 + x*3]) {
-                        for(int i = 0; i<3; i++) {
-                            for(int j = 0; j<3; j++) {
-                                if(board[i + x*3][colFactor + j] == k) {
-                                    col[j] = -1;
+                    if (locations[number - 1][2][l % 3 + x * 3])
+                    {
+                        for (int rowNum = 0; rowNum < 3; rowNum++)
+                        {
+                            for (int colNum = 0; colNum < 3; colNum++)
+                            {
+                                if (board[rowNum + x * 3][colNum + colFactor] == number)
+                                {
+                                    col[colNum] = -1;
                                 }
                             }
                         }
                     }
                 }
-                
 
                 int count = 0;
                 int coordinate[2];
-                for(int i = 0; i<3; i++) {
-                    if(row[i] != -1) {
-                        for(int j = 0; j<3; j++) {
-                            if(col[j] != -1) {
-                                if(!board[row[i]][col[j]]) {
+                for (int rowNum = 0; rowNum < 3; rowNum++)
+                {
+                    if (row[rowNum] != -1)
+                    {
+                        for (int colNum = 0; colNum < 3; colNum++)
+                        {
+                            if (col[colNum] != -1)
+                            {
+                                if (!board[row[rowNum]][col[colNum]])
+                                {
                                     count++;
-                                    coordinate[0] = row[i];
-                                    coordinate[1] = col[j];
+                                    coordinate[0] = row[rowNum];
+                                    coordinate[1] = col[colNum];
                                 }
                             }
                         }
                     }
                 }
-                // printf("Hello, l = %d, count = %d, k = %d\n", l, count, k);
-                if(count == 1) {
-                    board[coordinate[0]][coordinate[1]] = k;
-                    locations[k-1][0][coordinate[0]] = 1;
-                    locations[k-1][1][coordinate[1]] = 1;
-                    locations[k-1][2][l] = 1;
+                if (count == 1)
+                {
+                    board[coordinate[0]][coordinate[1]] = number;
+                    locations[number - 1][0][coordinate[0]] = 1;
+                    locations[number - 1][1][coordinate[1]] = 1;
+                    locations[number - 1][2][l] = 1;
                 }
             }
         }
     }
+}
+
+void solveHard()
+{ // Function to check possibilities
 }
