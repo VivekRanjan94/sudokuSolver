@@ -1,21 +1,23 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 //Declaring global variables
 int board[9][9];
-int locations[9][3][9];
-int possibility[9][3][9];
 //board[rows][columns]
+int locations[9][3][9];
 
 //Function prototypes
-int square(int rowNum, int colNum);
+int square(int, int);
 int checkSolve();
 void locationsInit();
 void boardInit();
 void printBoard();
 void setLocations();
+void update(int, int, int);
 void solveEasy();
 void solveMed();
 void solveHard();
+void solveBoard();
 
 //Main function
 int main()
@@ -37,18 +39,7 @@ int main()
     printf("\n");
 
     //Solving sudoku board
-    int previousCheck = 0;
-    for (;;)
-    {
-        if ((!checkSolve()) || (checkSolve() == previousCheck))
-        {
-            break;
-        }
-        previousCheck = checkSolve();
-        solveEasy();
-        solveMed();
-        solveHard();
-    }
+    solveBoard();
 
     //printing solved sudoku board
     printBoard();
@@ -165,6 +156,14 @@ void setLocations()
     }
 }
 
+void update(int rowNum, int colNum, int numToFill)
+{
+    board[rowNum][colNum] = numToFill;
+    locations[numToFill - 1][0][rowNum] = 1;
+    locations[numToFill - 1][1][colNum] = 1;
+    locations[numToFill - 1][2][square(rowNum, colNum)] = 1;
+}
+
 void solveEasy()
 {
     //Now we have an array locations[9][3][9]
@@ -198,10 +197,7 @@ void solveEasy()
                 }
                 if (count == 1)
                 {
-                    board[rowNum][colNum] = tempNumToFill;
-                    locations[tempNumToFill - 1][0][rowNum] = 1;
-                    locations[tempNumToFill - 1][1][colNum] = 1;
-                    locations[tempNumToFill - 1][2][square(rowNum, colNum)] = 1;
+                    update(rowNum, colNum, tempNumToFill);
                 }
             }
         }
@@ -222,16 +218,16 @@ void solveMed()
                 int row[3] = {rowFactor, rowFactor + 1, rowFactor + 2};
                 int col[3] = {colFactor, colFactor + 1, colFactor + 2};
 
-                for (int x = 0; x < 3; x++)
+                for (int i = 0; i < 3; i++)
                 {
                     //Row square check
-                    if (locations[number - 1][2][(l / 3) * 3 + x])
+                    if (locations[number - 1][2][(l / 3) * 3 + i])
                     {
                         for (int rowNum = 0; rowNum < 3; rowNum++)
                         {
                             for (int colNum = 0; colNum < 3; colNum++)
                             {
-                                if (board[rowNum + rowFactor][colNum + x * 3] == number)
+                                if (board[rowNum + rowFactor][colNum + i * 3] == number)
                                 {
                                     row[rowNum] = -1;
                                 }
@@ -240,13 +236,13 @@ void solveMed()
                     }
 
                     //Col square check
-                    if (locations[number - 1][2][l % 3 + x * 3])
+                    if (locations[number - 1][2][l % 3 + i * 3])
                     {
                         for (int rowNum = 0; rowNum < 3; rowNum++)
                         {
                             for (int colNum = 0; colNum < 3; colNum++)
                             {
-                                if (board[rowNum + x * 3][colNum + colFactor] == number)
+                                if (board[rowNum + i * 3][colNum + colFactor] == number)
                                 {
                                     col[colNum] = -1;
                                 }
@@ -277,10 +273,7 @@ void solveMed()
                 }
                 if (count == 1)
                 {
-                    board[coordinate[0]][coordinate[1]] = number;
-                    locations[number - 1][0][coordinate[0]] = 1;
-                    locations[number - 1][1][coordinate[1]] = 1;
-                    locations[number - 1][2][l] = 1;
+                    update(coordinate[0], coordinate[1], number);
                 }
             }
         }
@@ -288,5 +281,114 @@ void solveMed()
 }
 
 void solveHard()
-{ // Function to check possibilities
+{
+    for (int rowNum = 0; rowNum < 9; rowNum++)
+    {
+        for (int colNum = 0; colNum < 9; colNum++)
+        {
+            if (!board[rowNum][colNum])
+            {
+                for (int number = 1; number <= 9; number++)
+                {
+                    if (locations[number - 1][0][rowNum] == locations[number - 1][1][colNum] &&
+                        locations[number - 1][2][square(rowNum, colNum)] == locations[number - 1][1][colNum] &&
+                        locations[number - 1][0][rowNum] == 0)
+                    {
+                        //This number is a possibility in element (rowNum, colNum)
+                        bool flagCol = false;
+                        for (int colNum2 = 0; colNum2 < 9; colNum2++)
+                        {
+                            if (!board[rowNum][colNum2] && colNum2 != colNum)
+                            {
+                                if (locations[number - 1][0][rowNum] == locations[number - 1][1][colNum2] &&
+                                    locations[number - 1][2][square(rowNum, colNum2)] == locations[number - 1][1][colNum2] &&
+                                    locations[number - 1][0][rowNum] == 0)
+                                {
+                                    flagCol = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (flagCol)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            update(rowNum, colNum, number);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    //rowNum = 5
+    //colNum = 0
+    // number = 1
+    for (int colNum = 0; colNum < 9; colNum++)
+    {
+        for (int rowNum = 0; rowNum < 9; rowNum++)
+        {
+            if (!board[rowNum][colNum])
+            {
+                for (int number = 1; number <= 9; number++)
+                {
+
+                    if (!locations[number - 1][0][rowNum] &&
+                        !locations[number - 1][1][colNum] &&
+                        !locations[number - 1][2][square(rowNum, colNum)])
+                    {
+
+                        bool flagRow = false;
+                        for (int rowNum2 = 0; rowNum2 < 9; rowNum2++)
+                        {
+                            if (!board[rowNum2][colNum] && rowNum2 != rowNum)
+                            {
+                                if (!locations[number - 1][0][rowNum2] &&
+                                    !locations[number - 1][1][colNum] &&
+                                    !locations[number - 1][2][square(rowNum2, colNum)])
+                                {
+                                    flagRow = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (flagRow)
+                        {
+
+                            continue;
+                        }
+                        else
+                        {
+
+                            update(rowNum, colNum, number);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void solveBoard()
+{
+    int previousCheck = 0;
+    int loopCount = 0;
+    for (;;)
+    {
+        if ((!checkSolve()) || (checkSolve() == previousCheck))
+        {
+            int var = previousCheck;
+            solveHard();
+            if (var == checkSolve())
+            {
+                break;
+            }
+        }
+        previousCheck = checkSolve();
+        solveEasy();
+        solveMed();
+        loopCount++;
+    }
+    printf("%d\n", loopCount);
 }
