@@ -5,6 +5,7 @@
 int board[9][9];
 //board[rows][columns]
 int locations[9][3][9];
+bool extreme = false;
 
 //Function prototypes
 int square(int, int);
@@ -34,10 +35,8 @@ int main()
     //Printing sudoku board to solve
     printBoard();
 
-    printf("\n\nEnter any key to solve the board:\n");
+    printf("\n\nEnter any key to solve the board:");
     getchar();
-
-    printf("\n");
 
     //Solving sudoku board
     int previousCheck = 0;
@@ -63,7 +62,7 @@ int main()
     printBoard();
 
     fflush(stdin);
-    printf("\nEnter any key to quit:\n");
+    printf("\n\nEnter any key to quit:\n");
     getchar();
     return 0;
 }
@@ -468,15 +467,16 @@ void solveExpert()
                 {
                     if (possibilities[rowNum][colNum][number - 1])
                     {
+                        if (count == 2)
+                        {
+                            twoPossibilities[rowNum][colNum][0] = 0;
+                            twoPossibilities[rowNum][colNum][1] = 0;
+                            break;
+                        }
                         twoPossibilities[rowNum][colNum][count] = number;
                         count++;
                     }
-                    if (count > 2)
-                    {
-                        twoPossibilities[rowNum][colNum][0] = 0;
-                        twoPossibilities[rowNum][colNum][1] = 0;
-                        break;
-                    }
+                    
                 }
             }
         }
@@ -563,6 +563,9 @@ void solveExpert()
         solveBoard();
         if (checkSolve())
         {
+            if(i == iterator - 1) {
+                extreme = true;
+            }
             for (int rowNum = 0; rowNum < 9; rowNum++)
             {
                 for (int colNum = 0; colNum < 9; colNum++)
@@ -576,6 +579,37 @@ void solveExpert()
         else
         {
             return;
+        }
+    }
+    if(extreme) {
+        for(int i = 0; i< iterator - 1; i++) {
+            update(possibleFill[i] / 1000, (possibleFill[i] % 1000) / 100, (possibleFill[i] % 100) / 10);
+            for(int j = 0; j<iterator; j++) {
+                if(i==j) {
+                    break;
+                }
+                update(possibleFill[j] / 1000, (possibleFill[j] % 1000) / 100, (possibleFill[j] % 100) / 10);
+                solveBoard();
+                if (checkSolve())
+                {
+                    if(i == iterator - 1) {
+                        extreme = true;
+                    }
+                    for (int rowNum = 0; rowNum < 9; rowNum++)
+                    {
+                        for (int colNum = 0; colNum < 9; colNum++)
+                        {
+                            board[rowNum][colNum] = board1[rowNum][colNum];
+                        }
+                    }
+                    locationsInit();
+                    setLocations();
+                }
+                else
+                {
+                    return;
+                }
+            }
         }
     }
 }
