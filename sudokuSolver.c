@@ -69,11 +69,27 @@ int main()
 
 //Function declarations
 
+//Returns the number of square of coordinate (i,j)
+/*
+The square numbers are:- 
+0  0  0  :  1  1  1  :  2  2  2  
+0  0  0  :  1  1  1  :  2  2  2  
+0  0  0  :  1  1  1  :  2  2  2  
+.. .. .. .. .. .. .. .. .. .. .. 
+3  3  3  :  4  4  4  :  5  5  5  
+3  3  3  :  4  4  4  :  5  5  5  
+3  3  3  :  4  4  4  :  5  5  5  
+.. .. .. .. .. .. .. .. .. .. .. 
+6  6  6  :  7  7  7  :  8  8  8  
+6  6  6  :  7  7  7  :  8  8  8  
+6  6  6  :  7  7  7  :  8  8  8 
+*/
 int square(int rowNum, int colNum)
 {
     return ((rowNum / 3) * 3 + (colNum / 3));
 }
 
+//Function to return the number of zero's still left to fill in the board
 int checkSolve()
 {
     int count = 0;
@@ -90,6 +106,7 @@ int checkSolve()
     return count;
 }
 
+//Initializes the array locations[9][3][9] to all values of 0
 void locationsInit()
 {
     for (int number = 1; number <= 9; number++)
@@ -111,6 +128,7 @@ void locationsInit()
     }
 }
 
+//Reads board.txt file to input single sudoku board
 void boardInit()
 {
     FILE *ptr;
@@ -124,6 +142,7 @@ void boardInit()
     }
 }
 
+//Prints board[9][9] in sudoku board form
 void printBoard()
 {
     for (int rowNum = 0; rowNum < 9; rowNum++)
@@ -147,11 +166,16 @@ void printBoard()
         }
     }
 }
+/*
+Make a 2-D array with 3 1-D arrays for each number
+The 3 1-D arrays store 0 or 1 for whether the row, column or square contain the number
+Now take the intersection of these 3 arrays, if it is found that a number is in none, then fill it
 
-//Make a 2-D array with 3 1-D arrays for each number
-//The 3 1-D arrays store 0 or 1 for whether the row, column or square contain the number
-//Now take the intersection of these 3 arrays, if it is found that a number is in none, then fill it
-
+Sets the value of locations[9][3][9]
+If locations[i - 1][0][k] == 1 means that the number i is in the row k
+Similarly locations[i-1][1][k] == 1 means that the number i is in the column k
+And locations[i-1][2][k] == 1 means that the number i is in the square k
+*/
 void setLocations()
 {
     for (int number = 1; number <= 9; number++)
@@ -173,6 +197,8 @@ void setLocations()
     }
 }
 
+//This takes the coordinates of the element to fill and the number to fill in it
+//And updates its value in board[][] and locations[][][]
 void update(int rowNum, int colNum, int numToFill)
 {
     board[rowNum][colNum] = numToFill;
@@ -183,10 +209,6 @@ void update(int rowNum, int colNum, int numToFill)
 
 void solveEasy()
 {
-    //Now we have an array locations[9][3][9]
-    //If locations[k][0][i] == locations[k][1][j] == locations[k][2][l] == 0
-    //Means that the number k is not in location (i,j) coordinate and l'th square
-
     for (int rowNum = 0; rowNum < 9; rowNum++)
     {
         for (int colNum = 0; colNum < 9; colNum++)
@@ -388,10 +410,12 @@ void solveHard()
 void solveExpert()
 {
     int possibilities[9][9][9];
+    //possibilities[9][9][9] is an array that stores whether a number can be filled in an element
+    //possibilities[i][j][k-1] means that the number k can be filled in the coordinates (i,j)
     int possibleFill[81];
-    int iterator = 0;
     //possibleFill[i] is 4 digit number whose thousands digit is rowNum
     //hundreds digit is colNum, tens digit is minNumber, and units digit is minCount
+    int iterator = 0;
 
     //initialize possibleFill[81]
     for (int i = 0; i < 81; i++)
@@ -399,7 +423,9 @@ void solveExpert()
         possibleFill[i] = 9999;
     }
 
-    //Board1 stores a copy of board
+    //Board1 stores a copy of board so that changes made to board
+    //that do not result in solution of the sudoku board can be reverted
+
     int board1[9][9];
     for (int rowNum = 0; rowNum < 9; rowNum++)
     {
@@ -409,7 +435,7 @@ void solveExpert()
         }
     }
 
-    //Initialize possibilities
+    //Initialize possibilities[][][]
     for (int i = 0; i < 9; i++)
     {
         for (int j = 0; j < 9; j++)
@@ -441,8 +467,11 @@ void solveExpert()
         }
     }
 
-    //Initialize twoPossibilities
     int twoPossibilities[9][9][2];
+    // twoPossibilities[9][9][2] stores which coordinates only have 2 possible numbers that can be filled in them
+    // twoPossibilities[i][j][0] gives the first possibility that can be stored in (i,j) and twoPossibilities[i][j][1] returns the other
+
+    //Initialize twoPossibilities
     for (int i = 0; i < 9; i++)
     {
         for (int j = 0; j < 9; j++)
@@ -476,16 +505,20 @@ void solveExpert()
                         twoPossibilities[rowNum][colNum][count] = number;
                         count++;
                     }
-                    
                 }
             }
         }
     }
 
-    //Now we have possibilities at (i,j) stored in possibilities[i][j][]
-    //All elements with only two possibilities stored in twoPossiblities[i][j][]
-    //These possibilities are stored
+    /*
+        Now we have possibilities at (i,j) stored in possibilities[i][j][k]
+        All elements with only two possibilities stored in twoPossiblities[i][j]
 
+
+        Now the number of times a possibility appears in that respective row and column is stored in countP1 and countP2
+        The minimum of these will be stored in possibleFill[i] as rowNum*1000 + colNum*100 + minValue*10 + min
+        where min is the minimum of countP1 and countP2 and minValue is the respective number to be filled
+    */
     for (int rowNum = 0; rowNum < 9; rowNum++)
     {
         for (int colNum = 0; colNum < 9; colNum++)
@@ -543,8 +576,16 @@ void solveExpert()
             }
         }
     }
-    //put the next lines in for loop of sorted array
-    //sort array possibleFill
+
+    /*
+        Array possibleFill[81] is sorted by ascending order of min using insertion sort
+        Here min is the minimum number of times the possibility checked appears in that row and column
+        Now the possibility with least min will be filled into board and we will use solveBoard()
+        If the sudoku board remains unsolved after this, then it will reset board back to the state it was in 
+        using board1 and then try the next item in possibleFill[81]
+        If all values of possibleFill are checked and none can solve the sudoku board, then a boolean value extreme is set to true
+        If extreme == true, then instead of trying one possibility from possibleFill[81] we try 2 possiblities simultaneously
+    */
     for (int i = 1; i < iterator; i++)
     {
         for (int j = i; j >= 0; j--)
@@ -563,7 +604,8 @@ void solveExpert()
         solveBoard();
         if (checkSolve())
         {
-            if(i == iterator - 1) {
+            if (i == iterator - 1)
+            {
                 extreme = true;
             }
             for (int rowNum = 0; rowNum < 9; rowNum++)
@@ -581,18 +623,19 @@ void solveExpert()
             return;
         }
     }
-    if(extreme) {
-        for(int i = 0; i< iterator - 1; i++) {
+    if (extreme)
+    {
+        for (int i = 0; i < iterator; i++)
+        {
             update(possibleFill[i] / 1000, (possibleFill[i] % 1000) / 100, (possibleFill[i] % 100) / 10);
-            for(int j = 0; j<iterator; j++) {
-                if(i==j) {
-                    break;
-                }
+            for (int j = i + 1; j < iterator; j++)
+            {
                 update(possibleFill[j] / 1000, (possibleFill[j] % 1000) / 100, (possibleFill[j] % 100) / 10);
                 solveBoard();
                 if (checkSolve())
                 {
-                    if(i == iterator - 1) {
+                    if (i == iterator - 1)
+                    {
                         extreme = true;
                     }
                     for (int rowNum = 0; rowNum < 9; rowNum++)
@@ -614,6 +657,9 @@ void solveExpert()
     }
 }
 
+//If the sudoku board can be solved using solveEasy() and solveMed(), then those will be used
+//As soon as the same array goes through the loop twice, checkSolve() becomes equal to previousCheck
+//Then solveHard() is used with the same condition
 void solveBoard()
 {
     int previousCheck = 0;
@@ -621,9 +667,9 @@ void solveBoard()
     {
         if ((!checkSolve()) || (checkSolve() == previousCheck))
         {
-            int var = previousCheck;
+            int previousCheckHard = previousCheck;
             solveHard();
-            if (var == checkSolve())
+            if (previousCheckHard == checkSolve())
             {
                 break;
             }
