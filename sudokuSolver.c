@@ -52,7 +52,11 @@ int main()
             solveExpert();
             if (checkSolve() == previousCheck)
             {
-                break;
+                printf("The board entered is unsolvable or has multiple solutions.");
+                fflush(stdin);
+                printf("\n\nEnter any key to quit:\n");
+                getchar();
+                return 0;
             }
         }
         previousCheck = checkSolve();
@@ -170,7 +174,6 @@ void printBoard()
 Make a 2-D array with 3 1-D arrays for each number
 The 3 1-D arrays store 0 or 1 for whether the row, column or square contain the number
 Now take the intersection of these 3 arrays, if it is found that a number is in none, then fill it
-
 Sets the value of locations[9][3][9]
 If locations[i - 1][0][k] == 1 means that the number i is in the row k
 Similarly locations[i-1][1][k] == 1 means that the number i is in the column k
@@ -514,8 +517,6 @@ void solveExpert()
     /*
         Now we have possibilities at (i,j) stored in possibilities[i][j][k]
         All elements with only two possibilities stored in twoPossiblities[i][j]
-
-
         Now the number of times a possibility appears in that respective row and column is stored in countP1 and countP2
         The minimum of these will be stored in possibleFill[i] as rowNum*1000 + colNum*100 + minValue*10 + min
         where min is the minimum of countP1 and countP2 and minValue is the respective number to be filled
@@ -719,8 +720,6 @@ void solveExpert()
             /*
                 Now we have newPossibilities at (i,j) stored in newPossibilities[i][j][k]
                 All elements with only two newPossibilities stored in twoPossiblities[i][j]
-
-
                 Now the number of times a possibility appears in that respective row and column is stored in countP1 and countP2
                 The minimum of these will be stored in newPossibleFill[i] as rowNum*1000 + colNum*100 + minValue*10 + min
                 where min is the minimum of countP1 and countP2 and minValue is the respective number to be filled
