@@ -395,12 +395,10 @@ void solveHard()
                         }
                         if (flagRow)
                         {
-
                             continue;
                         }
                         else
                         {
-
                             update(rowNum, colNum, number);
                         }
                     }
@@ -412,20 +410,14 @@ void solveHard()
 
 void solveExpert()
 {
-    int possibilities[9][9][9];
+    int possibilities[9][9][9] = {0};
     //possibilities[9][9][9] is an array that stores whether a number can be filled in an element
     //possibilities[i][j][k-1] means that the number k can be filled in the coordinates (i,j)
 
-    int possibleFill[81];
+    int possibleFill[81] = {9999};
     //possibleFill[i] is an array of 4 digit number whose thousands digit is rowNum
     //hundreds digit is colNum, tens digit is minNumber, and units digit is minCount
     int iterator = 0;
-
-    //initialize possibleFill[81]
-    for (int i = 0; i < 81; i++)
-    {
-        possibleFill[i] = 9999;
-    }
 
     //Board1 stores a copy of board so that changes made to board
     //that do not result in solution of the sudoku board can be reverted
@@ -436,18 +428,6 @@ void solveExpert()
         for (int colNum = 0; colNum < 9; colNum++)
         {
             board1[rowNum][colNum] = board[rowNum][colNum];
-        }
-    }
-
-    //Initialize possibilities[][][]
-    for (int i = 0; i < 9; i++)
-    {
-        for (int j = 0; j < 9; j++)
-        {
-            for (int k = 0; k < 9; k++)
-            {
-                possibilities[i][j][k] = 0;
-            }
         }
     }
 
@@ -636,18 +616,7 @@ void solveExpert()
             solveBoard();
             //Update newTwoPossibilities array according to new board after filling possibleFill[i]
 
-            int newPossibilities[9][9][9];
-            //Initialize newPossibilities[][][]
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    for (int k = 0; k < 9; k++)
-                    {
-                        newPossibilities[i][j][k] = 0;
-                    }
-                }
-            }
+            int newPossibilities[9][9][9] = {0};
             //Set all newPossibilities
             for (int rowNum = 0; rowNum < 9; rowNum++)
             {
@@ -668,27 +637,15 @@ void solveExpert()
                 }
             }
 
-            int newPossibleFill[81];
+            int newPossibleFill[81] = {0};
             //initialize newPossibleFill[81]
-            for (int l = 0; l < 81; l++)
-            {
-                newPossibleFill[l] = 9999;
-            }
-            int newTwoPossibilities[9][9][2];
+            // for (int l = 0; l < 81; l++)
+            // {
+            //     newPossibleFill[l] = 9999;
+            // }
+            int newTwoPossibilities[9][9][2] = {0};
             // newTwoPossibilities[9][9][2] stores which coordinates only have 2 possible numbers that can be filled in them
             // newTwoPossibilities[i][j][0] gives the first possibility that can be stored in (i,j) and newTwoPossibilities[i][j][1] returns the other
-
-            //Initialize newTwoPossibilities
-            for (int l = 0; l < 9; l++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    for (int k = 0; k < 2; k++)
-                    {
-                        newTwoPossibilities[l][j][k] = 0;
-                    }
-                }
-            }
 
             //Count newPossibilities and if count == 2 store it in newTwoPossibilities
             //Set newTwoPossibilities
