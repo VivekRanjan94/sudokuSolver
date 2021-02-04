@@ -9,17 +9,17 @@ Once the board is entered, the executable file can be run and the output will be
 #Working -  
 The board is stored in a 2 dimensional array called `board[9][9]`  
   
-```0  0  0  :  1  1  1  :  2  2  2   
-0  0  0  :  1  1  1  :  2  2  2  
-0  0  0  :  1  1  1  :  2  2  2  
-.. .. .. .. .. .. .. .. .. .. ..  
-3  3  3  :  4  4  4  :  5  5  5  
-3  3  3  :  4  4  4  :  5  5  5  
-3  3  3  :  4  4  4  :  5  5  5  
-.. .. .. .. .. .. .. .. .. .. ..  
-6  6  6  :  7  7  7  :  8  8  8  
-6  6  6  :  7  7  7  :  8  8  8  
-6  6  6  :  7  7  7  :  8  8  8```  
+`0  0  0  :  1  1  1  :  2  2  2`   
+`0  0  0  :  1  1  1  :  2  2  2`  
+`0  0  0  :  1  1  1  :  2  2  2`  
+`. . . . . . . . . . .   `  
+`3  3  3  :  4  4  4  :  5  5  5`  
+`3  3  3  :  4  4  4  :  5  5  5`  
+`3  3  3  :  4  4  4  :  5  5  5`  
+`. . . . . . . . . . .   `  
+`6  6  6  :  7  7  7  :  8  8  8`  
+`6  6  6  :  7  7  7  :  8  8  8`  
+`6  6  6  :  7  7  7  :  8  8  8`  
   
 An array called `locations[9][3][9]`
 	This array stores whether or not a number can be filled in a certain element or not  
@@ -31,7 +31,8 @@ Once `locations[9][3][9]` is set,
 There are multiple functions, `solveEasy`, `solveMed`, `solveHard`, and `solveExpert`  
 1) solveEasy -  
 	This function traverses through all empty elements in the board   
-	If the locations[9][3][9] array shows that a number is uniquely absent in  the corresponding row, column, and square of the empty element,  
+	If the locations[9][3][9] array shows that a number is uniquely absent in  
+	the corresponding row, column, and square of the empty element,  
 	the number is filled into the element  
 	  
 	This is a complete brute force method and can only solve easy level boards  
