@@ -4,7 +4,7 @@ The file `board.txt` should contain only one sudoku board
 The board has to be entered element by element line by line (Each element separated by a space)  
   
 Once the board is entered, the executable file can be run and the output will be displayed in the terminal  
-`easy.txt`, `medium.txt`, `hard.txt`, and `expert.txt` contain some sudoku boards copied from [sudoku](sudoku.com)  
+`easy.txt`, `medium.txt`, `hard.txt`, and `expert.txt` contain some sudoku boards copied from sudoku.com  
 
 #Working -  
 The board is stored in a 2 dimensional array called `board[9][9]`  
